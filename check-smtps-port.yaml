@@ -1,0 +1,44 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 3b7b3890b2bf44649a76f0be7cbf3e0e
+      template: 'Check SMTPS Port'
+      name: 'Check SMTPS Port'
+      vendor:
+        name: Yasuwo
+        version: '0.1'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 36460a6529184019b1cd8c2be4c472c6
+          name: 'SMTPS Perf'
+          type: SIMPLE
+          key: 'net.tcp.service.perf[tcp,,465]'
+          value_type: FLOAT
+          units: ms
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
+        - uuid: d287ad347d8f4c62ba1985f77a99b8e2
+          name: 'SMTPS Status'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,465]'
+          valuemap:
+            name: Status
+          triggers:
+            - uuid: c5270106212f4d4cbcb674df5949e4e6
+              expression: 'last(/Check SMTPS Port/net.tcp.service[tcp,,465])=0'
+              name: 'SMTPS Port Down'
+              priority: HIGH
+      valuemaps:
+        - uuid: d298610353554b3f964af2494ea3d708
+          name: Status
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up

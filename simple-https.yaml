@@ -1,0 +1,44 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 50e24d498c2d4f19b9c83cd39ea93ff0
+      template: 'Simple HTTPS'
+      name: 'Simple HTTPS'
+      vendor:
+        name: Yasuwo
+        version: '0.1'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 79694fa1c03c49d2b5d0d0c097ca6a83
+          name: 'HTTPS Perf'
+          type: SIMPLE
+          key: 'net.tcp.service.perf[https]'
+          value_type: FLOAT
+          units: ms
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
+        - uuid: f38a682cb1774bd4acb89c56c1c47766
+          name: 'HTTPS Status'
+          type: SIMPLE
+          key: 'net.tcp.service[https]'
+          valuemap:
+            name: Status
+          triggers:
+            - uuid: e67256cc97e54ee68a1987608cbed323
+              expression: 'last(/Simple HTTPS/net.tcp.service[https])=0'
+              name: 'HTTPS Down'
+              priority: HIGH
+      valuemaps:
+        - uuid: e84009284cda48d3a391d6636212262e
+          name: Status
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up

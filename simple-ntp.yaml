@@ -1,0 +1,44 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: db742cc00eef4d578f25ded0ff55c9c4
+      template: 'Simple NTP'
+      name: 'Simple NTP'
+      vendor:
+        name: Yasuwo
+        version: '0.1'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 1ec4e07a460e44839ffbe119f88111bf
+          name: 'NTP Perf'
+          type: SIMPLE
+          key: 'net.udp.service.perf[ntp]'
+          value_type: FLOAT
+          units: ms
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
+        - uuid: 11c24686a00a464ca44455c7bad6936d
+          name: 'NTP Status'
+          type: SIMPLE
+          key: 'net.udp.service[ntp]'
+          valuemap:
+            name: Status
+          triggers:
+            - uuid: c65e51377f8c4b1cb07b85bf7d48c29b
+              expression: 'last(/Simple NTP/net.udp.service[ntp])=0'
+              name: 'NTP Down'
+              priority: HIGH
+      valuemaps:
+        - uuid: aa5cc7284951435582990c651f1cdd99
+          name: Status
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up

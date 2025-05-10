@@ -1,0 +1,44 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 339863c66f324b47ad7e54f8face0dbf
+      template: 'Check IMAPS Port'
+      name: 'Check IMAPS Port'
+      vendor:
+        name: Yasuwo
+        version: '0.1'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 822ae48f5f704f05b9bef283ad3959e7
+          name: 'IMAPS Perf'
+          type: SIMPLE
+          key: 'net.tcp.service.perf[tcp,,993]'
+          value_type: FLOAT
+          units: ms
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
+        - uuid: 80d7286bd91f4f84a182ffe157a05f63
+          name: 'IMAPS Status'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,993]'
+          valuemap:
+            name: Status
+          triggers:
+            - uuid: 64b47837f51a42fdb53fc3b60aea7ef6
+              expression: 'last(/Check IMAPS Port/net.tcp.service[tcp,,993])=0'
+              name: 'IMAPS Port Down'
+              priority: HIGH
+      valuemaps:
+        - uuid: d11a4874ac954a0aa422666ad9afadf6
+          name: Status
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
